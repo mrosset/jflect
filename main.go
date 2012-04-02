@@ -16,7 +16,8 @@ import (
 var (
 	client  = new(http.Client)
 	fstruct = flag.String("s", "User", "struct name for json object")
-	furl    = flag.String("u", "https://api.github.com/users/str1ngs", "url for json input")
+	furl    = flag.String("u", "", "url for json input")
+	fpkg    = flag.String("p", "main", "package name")
 )
 
 func main() {
@@ -39,15 +40,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err = reflect(os.Stdout, v, *fstruct); err != nil {
+	if err = reflect(os.Stdout, v, *fpkg, *fstruct); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func reflect(w io.Writer, i interface{}, strct string) (err error) {
+func reflect(w io.Writer, i interface{}, pkg string, strct string) (err error) {
 	bb := new(bytes.Buffer)
 	switch i := i.(type) {
 	case map[string]interface{}:
+		fmt.Fprintf(bb, "package %s\n", pkg)
 		fmt.Fprintf(bb, "type %s struct {\n", strct)
 		for key, val := range i {
 			if len(key) == 0 {
@@ -56,7 +58,7 @@ func reflect(w io.Writer, i interface{}, strct string) (err error) {
 			gotype := fmt.Sprintf("%T", val)
 			switch gotype {
 			case "<nil>":
-				gotype = "nil"
+				continue
 			case "float64":
 				gotype = "int"
 			}
@@ -76,7 +78,6 @@ func reflect(w io.Writer, i interface{}, strct string) (err error) {
 			fmt.Fprintf(bb, "%s %s `json:\"%s\"`\n", field, gotype, key)
 		}
 		fmt.Fprintln(bb, "}")
-
 		cmd := exec.Command("gofmt")
 		cmd.Stdin = bb
 		cmd.Stdout = w
