@@ -13,15 +13,8 @@ var (
 )
 
 func TestReflect(t *testing.T) {
-	var v interface{}
-	err := decode(&v, url)
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = reflect(os.Stdout, v, "main", "Foo")
-	if err != nil {
-		t.Error(err)
-	}
+	os.Args = append(os.Args, "-u", url)
+	main()
 }
 
 func decode(v *interface{}, url string) (err error) {
