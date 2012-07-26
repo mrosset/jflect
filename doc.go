@@ -17,24 +17,24 @@ Web service:
 
 Output:
 
-type GithubUser struct {
- AvatarUrl   string `json:"avatar_url"`
- Bio         string `json:"bio"`
- CreatedAt   string `json:"created_at"`
- Followers   int    `json:"followers"`
- Following   int    `json:"following"`
- GravatarId  string `json:"gravatar_id"`
- Hireable    bool   `json:"hireable"`
- HtmlUrl     string `json:"html_url"`
- Id          int    `json:"id"`
- Location    string `json:"location"`
- Login       string `json:"login"`
- Name        string `json:"name"`
- PublicGists int    `json:"public_gists"`
- PublicRepos int    `json:"public_repos"`
- Type        string `json:"type"`
- Url         string `json:"url"`
-}
+ type GitHubUser struct {
+	 AvatarUrl   string `json:"avatar_url"`
+	 Bio         string `json:"bio"`
+	 CreatedAt   string `json:"created_at"`
+	 Followers   int    `json:"followers"`
+	 Following   int    `json:"following"`
+	 GravatarId  string `json:"gravatar_id"`
+	 Hireable    bool   `json:"hireable"`
+	 HtmlUrl     string `json:"html_url"`
+	 Id          int    `json:"id"`
+	 Location    string `json:"location"`
+	 Login       string `json:"login"`
+	 Name        string `json:"name"`
+	 PublicGists int    `json:"public_gists"`
+	 PublicRepos int    `json:"public_repos"`
+	 Type        string `json:"type"`
+	 Url         string `json:"url"`
+ }
 
 From file:
 
