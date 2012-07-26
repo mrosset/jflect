@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-Jflect takes json from stdin and outputs go structs to stdout.
+Jflect takes JSON from stdin and outputs go structs to stdout.
 
 Installing
 
@@ -50,8 +50,8 @@ Saving is just a matter of redirecting stdout to a file.
 Notes
 
 Jflect is primarily designed to fast prototype go structs. Its not intended for 
-automation. It does handle nested json objects. But does not currently handle 
-arbitrary json arrays.
+automation. It does handle nested JSON objects. But does not currently handle 
+arbitrary JSON arrays.
 
 */
 package documentation

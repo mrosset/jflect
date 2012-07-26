@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"unicode"
+)
+
 // Field data type
 type Field struct {
 	name  string
@@ -21,4 +26,27 @@ func (s FieldSort) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 
 func (s FieldSort) Less(i, j int) bool {
 	return s[i].name < s[j].name
+}
+
+// Return lower_case json fields to camel case fields.
+func goField(jf string) string {
+	mkUpper := true
+	gf := ""
+	for _, c := range jf {
+		if mkUpper {
+			c = unicode.ToUpper(c)
+			mkUpper = false
+		}
+		if c == '_' {
+			mkUpper = true
+			continue
+		}
+		gf += string(c)
+	}
+	return fmt.Sprintf("%s", gf)
+}
+
+// Returns the json tag from a json field.
+func goTag(jf string) string {
+	return fmt.Sprintf("`json:\"%s\"`", jf)
 }

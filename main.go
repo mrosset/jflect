@@ -9,13 +9,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	ujson "github.com/str1ngs/util/json"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"sort"
-	"unicode"
 )
 
 // TODO: write proper Usage and README
@@ -30,19 +28,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func jfmt(r io.Reader, w io.Writer) error {
-	var v interface{}
-	err := json.NewDecoder(r).Decode(&v)
-	if err != nil {
-		return err
-	}
-	err = ujson.WritePretty(&v, w)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func read(r io.Reader, w io.Writer) error {
@@ -119,27 +104,4 @@ func xreflect(v interface{}) ([]byte, error) {
 		fmt.Fprintf(buf, "%s %s %s\n", f.name, f.gtype, f.tag)
 	}
 	return buf.Bytes(), nil
-}
-
-// Return lower_case json fields to camel case fields.
-func goField(jf string) string {
-	mkUpper := true
-	gf := ""
-	for _, c := range jf {
-		if mkUpper {
-			c = unicode.ToUpper(c)
-			mkUpper = false
-		}
-		if c == '_' {
-			mkUpper = true
-			continue
-		}
-		gf += string(c)
-	}
-	return fmt.Sprintf("%s", gf)
-}
-
-// Returns the json tag from a json field.
-func goTag(jf string) string {
-	return fmt.Sprintf("`json:\"%s\"`", jf)
 }
