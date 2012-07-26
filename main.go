@@ -9,8 +9,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	ujson "github.com/str1ngs/util/json"
+	"io"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"sort"
@@ -19,38 +20,43 @@ import (
 
 // TODO: write proper Usage and README
 var (
-	client  = new(http.Client)
 	fstruct = flag.String("s", "Foo", "struct name for json object")
-	furl    = flag.String("u", "", "url for json input")
 	debug   = false
 )
 
 func main() {
 	flag.Parse()
-	if *furl == "" {
-		flag.Usage()
-		os.Exit(1)
+	err := read(os.Stdin, os.Stdout)
+	if err != nil {
+		log.Fatal(err)
 	}
+}
+
+func jfmt(r io.Reader, w io.Writer) error {
 	var v interface{}
-	res, err := client.Get(*furl)
+	err := json.NewDecoder(r).Decode(&v)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	if res.StatusCode != http.StatusOK {
-		errf := fmt.Errorf("%s %v %s", *furl, res.StatusCode,
-			http.StatusText(res.StatusCode))
-		log.Fatal(errf)
-	}
-	err = json.NewDecoder(res.Body).Decode(&v)
+	err = ujson.WritePretty(&v, w)
 	if err != nil {
-		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+func read(r io.Reader, w io.Writer) error {
+	var v interface{}
+	err := json.NewDecoder(r).Decode(&v)
+	if err != nil {
+		return err
 	}
 	buf := new(bytes.Buffer)
 	// Open struct
-	fmt.Fprintf(buf, "\ntype %s struct {\n", *fstruct)
-	b, err := reflect(v)
+	fmt.Fprintf(buf, "type %s struct {\n", *fstruct)
+	b, err := xreflect(v)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	// Write fields to buffer
 	buf.Write(b)
@@ -64,38 +70,16 @@ func main() {
 	// Pass through gofmt for uniform formatting, and weak syntax check.
 	cmd := exec.Command("gofmt")
 	cmd.Stdin = buf
-	cmd.Stdout = os.Stdout
+	cmd.Stdout = w
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
-// Field data type
-type Field struct {
-	name  string
-	gtype string
-	tag   string
-}
-
-// Simplifies Field construction
-func NewField(name, gtype string) Field {
-	return Field{goField(name), gtype, goTag(name)}
-}
-
-// Provides Sorter interface so we can keep field order
-type FieldSort []Field
-
-func (s FieldSort) Len() int { return len(s) }
-
-func (s FieldSort) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-
-func (s FieldSort) Less(i, j int) bool {
-	return s[i].name < s[j].name
-}
-
-func reflect(v interface{}) ([]byte, error) {
+func xreflect(v interface{}) ([]byte, error) {
 	var (
 		buf = new(bytes.Buffer)
 	)
@@ -113,7 +97,7 @@ func reflect(v interface{}) ([]byte, error) {
 			case map[string]interface{}:
 				// If type is map[string]interface{} then we have nested object, Recurse
 				fmt.Fprintf(buf, "%s struct {\n", goField(key))
-				o, err := reflect(j)
+				o, err := xreflect(j)
 				if err != nil {
 					return nil, err
 				}

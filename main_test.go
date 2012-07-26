@@ -1,30 +1,60 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
+	"bytes"
+	"io"
 	"os"
+	"reflect"
 	"testing"
 )
+
+type testFile struct {
+	path string
+}
 
 var (
 	url = "https://api.github.com/repos/str1ngs/gotimer"
 )
 
-func TestReflect(t *testing.T) {
-	os.Args = append(os.Args, "-u", url)
-	main()
+var testFiles = []testFile{
+	{
+		path: "testdata/gotimer.json",
+	},
 }
 
-func decode(v *interface{}, url string) (err error) {
-	res, err := http.Get(url)
+func TestReflect(t *testing.T) {
+	for _, f := range testFiles {
+		want, err := readWant(f.path + ".want")
+		if err != nil {
+			t.Fatal(err)
+		}
+		fd, err := os.Open(f.path)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		defer fd.Close()
+		got := new(bytes.Buffer)
+		err = read(fd, got)
+		if err != nil {
+			t.Error(err)
+		}
+		if !reflect.DeepEqual(want, got.Bytes()) {
+			t.Errorf("%s: want %d bytes got %d bytes", f.path, len(want), len(got.Bytes()))
+		}
+	}
+}
+
+func readWant(p string) ([]byte, error) {
+	fd, err := os.Open(p)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("%s %v %s", url, res.StatusCode,
-			http.StatusText(res.StatusCode))
+	defer fd.Close()
+	buf := new(bytes.Buffer)
+	_, err = io.Copy(buf, fd)
+	if err != nil {
+		return nil, err
 	}
-	return json.NewDecoder(res.Body).Decode(&v)
+	return buf.Bytes(), nil
 }
