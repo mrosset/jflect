@@ -54,4 +54,4 @@ automation. It does handle nested JSON objects. But does not currently handle
 arbitrary JSON arrays.
 
 */
-package documentation
+package main
