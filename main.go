@@ -88,6 +88,8 @@ func xreflect(v interface{}) ([]byte, error) {
 					return nil, err
 				}
 				fmt.Fprintln(buf, "}")
+			case []interface{}:
+				fields = append(fields, NewField(key, sliceType(j)))
 			default:
 				fields = append(fields, NewField(key, fmt.Sprintf("%T", val)))
 			}
@@ -101,4 +103,29 @@ func xreflect(v interface{}) ([]byte, error) {
 		fmt.Fprintf(buf, "%s %s %s\n", f.name, f.gtype, f.tag)
 	}
 	return buf.Bytes(), nil
+}
+
+// if all entries in j are the same type, return slice of that type
+func sliceType(j []interface{}) string {
+	dft := "[]interface{}"
+	if len(j) == 0 {
+		return dft
+	}
+	var t, t2 string
+	for _, v := range j {
+		switch v.(type) {
+		case string:
+			t2 = "[]string"
+		case float64:
+			t2 = "[]int"
+		default:
+			// something else, just return default
+			return dft
+		}
+		if t != "" && t != t2 {
+			return dft
+		}
+		t = t2
+	}
+	return t
 }

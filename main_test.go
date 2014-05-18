@@ -45,6 +45,32 @@ func TestReflect(t *testing.T) {
 	}
 }
 
+func TestSliceType(t *testing.T) {
+	ty := sliceType([]interface{}{})
+	exp := "[]interface{}"
+	if ty != exp {
+		t.Fatalf("expected %s; got %s", exp, ty)
+	}
+
+	ty = sliceType([]interface{}{"a", "b"})
+	exp = "[]string"
+	if ty != exp {
+		t.Fatalf("expected %s; got %s", exp, ty)
+	}
+
+	ty = sliceType([]interface{}{float64(1), float64(2)})
+	exp = "[]int"
+	if ty != exp {
+		t.Fatalf("expected %s; got %s", exp, ty)
+	}
+
+	ty = sliceType([]interface{}{"a", 1})
+	exp = "[]interface{}"
+	if ty != exp {
+		t.Fatalf("expected %s; got %s", exp, ty)
+	}
+}
+
 func readWant(p string) ([]byte, error) {
 	fd, err := os.Open(p)
 	if err != nil {
