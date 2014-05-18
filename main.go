@@ -9,10 +9,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"go/format"
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"sort"
 )
 
@@ -53,14 +53,11 @@ func read(r io.Reader, w io.Writer) error {
 		os.Stdout.WriteString("*********DEBUG***********")
 	}
 	// Pass through gofmt for uniform formatting, and weak syntax check.
-	cmd := exec.Command("gofmt")
-	cmd.Stdin = buf
-	cmd.Stdout = w
-	cmd.Stderr = os.Stderr
-	err = cmd.Run()
+	b, err = format.Source(buf.Bytes())
 	if err != nil {
 		return err
 	}
+	w.Write(b)
 	return nil
 }
 
