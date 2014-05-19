@@ -1,11 +1,4 @@
 type Foo struct {
-	Owner struct {
-		AvatarUrl  string `json:"avatar_url"`
-		GravatarId string `json:"gravatar_id"`
-		Id         int    `json:"id"`
-		Login      string `json:"login"`
-		Url        string `json:"url"`
-	}
 	CloneUrl        string   `json:"clone_url"`
 	CreatedAt       string   `json:"created_at"`
 	Description     string   `json:"description"`
@@ -27,13 +20,20 @@ type Foo struct {
 	NetworkCount    int      `json:"network_count"`
 	OpenIssues      int      `json:"open_issues"`
 	OpenIssuesCount int      `json:"open_issues_count"`
-	Private         bool     `json:"private"`
-	PushedAt        string   `json:"pushed_at"`
-	Size            int      `json:"size"`
-	SshUrl          string   `json:"ssh_url"`
-	SvnUrl          string   `json:"svn_url"`
-	UpdatedAt       string   `json:"updated_at"`
-	Url             string   `json:"url"`
-	Watchers        int      `json:"watchers"`
-	WatchersCount   int      `json:"watchers_count"`
+	Owner           struct {
+		AvatarUrl  string `json:"avatar_url"`
+		GravatarId string `json:"gravatar_id"`
+		Id         int    `json:"id"`
+		Login      string `json:"login"`
+		Url        string `json:"url"`
+	} `json:"owner"`
+	Private       bool   `json:"private"`
+	PushedAt      string `json:"pushed_at"`
+	Size          int    `json:"size"`
+	SshUrl        string `json:"ssh_url"`
+	SvnUrl        string `json:"svn_url"`
+	UpdatedAt     string `json:"updated_at"`
+	Url           string `json:"url"`
+	Watchers      int    `json:"watchers"`
+	WatchersCount int    `json:"watchers_count"`
 }

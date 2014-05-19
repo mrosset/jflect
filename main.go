@@ -38,15 +38,12 @@ func read(r io.Reader, w io.Writer) error {
 	}
 	buf := new(bytes.Buffer)
 	// Open struct
-	fmt.Fprintf(buf, "type %s struct {\n", *fstruct)
 	b, err := xreflect(v)
 	if err != nil {
 		return err
 	}
-	// Write fields to buffer
-	buf.Write(b)
-	// Close struct
-	fmt.Fprintln(buf, "}")
+	field := NewField(*fstruct, "struct", b...)
+	fmt.Fprintf(buf, "type %s %s", field.name, field.gtype)
 	if debug {
 		os.Stdout.WriteString("*********DEBUG***********")
 		os.Stdout.Write(buf.Bytes())
@@ -78,16 +75,11 @@ func xreflect(v interface{}) ([]byte, error) {
 				fields = append(fields, NewField(key, "int"))
 			case map[string]interface{}:
 				// If type is map[string]interface{} then we have nested object, Recurse
-				fmt.Fprintf(buf, "%s struct {\n", goField(key))
 				o, err := xreflect(j)
 				if err != nil {
 					return nil, err
 				}
-				_, err = buf.Write(o)
-				if err != nil {
-					return nil, err
-				}
-				fmt.Fprintln(buf, "}")
+				fields = append(fields, NewField(key, "struct", o...))
 			case []interface{}:
 				fields = append(fields, NewField(key, sliceType(j)))
 			default:
