@@ -40,5 +40,14 @@
     "event1",
     "event2",
     "event3"
+  ],
+  "hashes": [
+    {
+      "id": 123,
+      "desc": ""
+    },
+    {
+      "id": 123
+    }
   ]
 }

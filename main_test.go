@@ -46,26 +46,42 @@ func TestReflect(t *testing.T) {
 }
 
 func TestSliceType(t *testing.T) {
-	ty := sliceType([]interface{}{})
+	ty, _ := sliceType([]interface{}{})
 	exp := "[]interface{}"
 	if ty != exp {
 		t.Fatalf("expected %s; got %s", exp, ty)
 	}
 
-	ty = sliceType([]interface{}{"a", "b"})
+	ty, _ = sliceType([]interface{}{"a", "b"})
 	exp = "[]string"
 	if ty != exp {
 		t.Fatalf("expected %s; got %s", exp, ty)
 	}
 
-	ty = sliceType([]interface{}{float64(1), float64(2)})
+	ty, _ = sliceType([]interface{}{float64(1), float64(2)})
 	exp = "[]int"
 	if ty != exp {
 		t.Fatalf("expected %s; got %s", exp, ty)
 	}
 
-	ty = sliceType([]interface{}{"a", 1})
+	ty, _ = sliceType([]interface{}{"a", 1})
 	exp = "[]interface{}"
+	if ty != exp {
+		t.Fatalf("expected %s; got %s", exp, ty)
+	}
+
+	ty, _ = sliceType([]interface{}{
+		map[string]interface{}{
+			"a": "aa",
+			"b": "bb",
+			"c": "cc",
+		},
+		map[string]interface{}{
+			"a": "aa",
+			"b": "bb",
+		},
+	})
+	exp = "[]struct {A string `json:\"a\"`\nB string `json:\"b\"`\nC string `json:\"c\"`\n}"
 	if ty != exp {
 		t.Fatalf("expected %s; got %s", exp, ty)
 	}

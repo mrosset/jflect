@@ -81,7 +81,11 @@ func xreflect(v interface{}) ([]byte, error) {
 				}
 				fields = append(fields, NewField(key, "struct", o...))
 			case []interface{}:
-				fields = append(fields, NewField(key, sliceType(j)))
+				gtype, err := sliceType(j)
+				if err != nil {
+					return nil, err
+				}
+				fields = append(fields, NewField(key, gtype))
 			default:
 				fields = append(fields, NewField(key, fmt.Sprintf("%T", val)))
 			}
@@ -98,10 +102,10 @@ func xreflect(v interface{}) ([]byte, error) {
 }
 
 // if all entries in j are the same type, return slice of that type
-func sliceType(j []interface{}) string {
+func sliceType(j []interface{}) (string, error) {
 	dft := "[]interface{}"
 	if len(j) == 0 {
-		return dft
+		return dft, nil
 	}
 	var t, t2 string
 	for _, v := range j {
@@ -110,14 +114,25 @@ func sliceType(j []interface{}) string {
 			t2 = "[]string"
 		case float64:
 			t2 = "[]int"
+		case map[string]interface{}:
+			t2 = "[]struct"
 		default:
 			// something else, just return default
-			return dft
+			return dft, nil
 		}
 		if t != "" && t != t2 {
-			return dft
+			return dft, nil
 		}
 		t = t2
 	}
-	return t
+
+	if t == "[]struct" {
+		o, err := xreflect(j[0])
+		if err != nil {
+			return "", err
+		}
+		f := NewField("", "struct", o...)
+		t = "[]" + f.gtype
+	}
+	return t, nil
 }
