@@ -9,10 +9,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"go/format"
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"sort"
 )
 
@@ -38,29 +38,23 @@ func read(r io.Reader, w io.Writer) error {
 	}
 	buf := new(bytes.Buffer)
 	// Open struct
-	fmt.Fprintf(buf, "type %s struct {\n", *fstruct)
 	b, err := xreflect(v)
 	if err != nil {
 		return err
 	}
-	// Write fields to buffer
-	buf.Write(b)
-	// Close struct
-	fmt.Fprintln(buf, "}")
+	field := NewField(*fstruct, "struct", b...)
+	fmt.Fprintf(buf, "type %s %s", field.name, field.gtype)
 	if debug {
 		os.Stdout.WriteString("*********DEBUG***********")
 		os.Stdout.Write(buf.Bytes())
 		os.Stdout.WriteString("*********DEBUG***********")
 	}
 	// Pass through gofmt for uniform formatting, and weak syntax check.
-	cmd := exec.Command("gofmt")
-	cmd.Stdin = buf
-	cmd.Stdout = w
-	cmd.Stderr = os.Stderr
-	err = cmd.Run()
+	b, err = format.Source(buf.Bytes())
 	if err != nil {
 		return err
 	}
+	w.Write(b)
 	return nil
 }
 
@@ -81,16 +75,17 @@ func xreflect(v interface{}) ([]byte, error) {
 				fields = append(fields, NewField(key, "int"))
 			case map[string]interface{}:
 				// If type is map[string]interface{} then we have nested object, Recurse
-				fmt.Fprintf(buf, "%s struct {\n", goField(key))
 				o, err := xreflect(j)
 				if err != nil {
 					return nil, err
 				}
-				_, err = buf.Write(o)
+				fields = append(fields, NewField(key, "struct", o...))
+			case []interface{}:
+				gtype, err := sliceType(j)
 				if err != nil {
 					return nil, err
 				}
-				fmt.Fprintln(buf, "}")
+				fields = append(fields, NewField(key, gtype))
 			default:
 				fields = append(fields, NewField(key, fmt.Sprintf("%T", val)))
 			}
@@ -104,4 +99,40 @@ func xreflect(v interface{}) ([]byte, error) {
 		fmt.Fprintf(buf, "%s %s %s\n", f.name, f.gtype, f.tag)
 	}
 	return buf.Bytes(), nil
+}
+
+// if all entries in j are the same type, return slice of that type
+func sliceType(j []interface{}) (string, error) {
+	dft := "[]interface{}"
+	if len(j) == 0 {
+		return dft, nil
+	}
+	var t, t2 string
+	for _, v := range j {
+		switch v.(type) {
+		case string:
+			t2 = "[]string"
+		case float64:
+			t2 = "[]int"
+		case map[string]interface{}:
+			t2 = "[]struct"
+		default:
+			// something else, just return default
+			return dft, nil
+		}
+		if t != "" && t != t2 {
+			return dft, nil
+		}
+		t = t2
+	}
+
+	if t == "[]struct" {
+		o, err := xreflect(j[0])
+		if err != nil {
+			return "", err
+		}
+		f := NewField("", "struct", o...)
+		t = "[]" + f.gtype
+	}
+	return t, nil
 }

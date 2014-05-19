@@ -13,7 +13,10 @@ type Field struct {
 }
 
 // Simplifies Field construction
-func NewField(name, gtype string) Field {
+func NewField(name, gtype string, body ...byte) Field {
+	if gtype == "struct" {
+		gtype = fmt.Sprintf("%s {%s}", gtype, body)
+	}
 	return Field{goField(name), gtype, goTag(name)}
 }
 

@@ -35,5 +35,19 @@
   "url": "https://api.github.com/repos/str1ngs/gotimer",
   "private": false,
   "id": 1857980,
-  "description": ""
+  "description": "",
+  "events": [
+    "event1",
+    "event2",
+    "event3"
+  ],
+  "hashes": [
+    {
+      "id": 123,
+      "desc": ""
+    },
+    {
+      "id": 123
+    }
+  ]
 }
