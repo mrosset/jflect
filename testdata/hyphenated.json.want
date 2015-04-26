@@ -1,0 +1,3 @@
+type Foo struct {
+	SearchHistory string `json:"search-history"`
+}
