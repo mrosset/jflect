@@ -87,6 +87,19 @@ func TestSliceType(t *testing.T) {
 	}
 }
 
+func TestHyphenError(t *testing.T) {
+	var (
+		j = `{"some-key": "foo"}`
+	)
+	bw := bytes.NewBufferString(j)
+	out, _ := os.Open(os.DevNull)
+	defer out.Close()
+	err := read(bw, out)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func readWant(p string) ([]byte, error) {
 	fd, err := os.Open(p)
 	if err != nil {

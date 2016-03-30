@@ -7,19 +7,22 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"go/format"
 	"io"
-	"log"
+	glog "log"
 	"os"
 	"sort"
 )
 
 // TODO: write proper Usage and README
 var (
-	fstruct = flag.String("s", "Foo", "struct name for json object")
-	debug   = false
+	log               = glog.New(os.Stderr, "", glog.Lshortfile)
+	fstruct           = flag.String("s", "Foo", "struct name for json object")
+	debug             = false
+	ErrNotValidSyntax = errors.New("Json reflection is not valid Go syntax")
 )
 
 func main() {
@@ -34,12 +37,14 @@ func read(r io.Reader, w io.Writer) error {
 	var v interface{}
 	err := json.NewDecoder(r).Decode(&v)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	buf := new(bytes.Buffer)
 	// Open struct
 	b, err := xreflect(v)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	field := NewField(*fstruct, "struct", b...)
@@ -52,7 +57,12 @@ func read(r io.Reader, w io.Writer) error {
 	// Pass through gofmt for uniform formatting, and weak syntax check.
 	b, err = format.Source(buf.Bytes())
 	if err != nil {
-		return err
+		log.Println(err)
+		fmt.Println("Final Go Code")
+		fmt.Println()
+		os.Stderr.Write(buf.Bytes())
+		fmt.Println()
+		return ErrNotValidSyntax
 	}
 	w.Write(b)
 	return nil
@@ -77,12 +87,14 @@ func xreflect(v interface{}) ([]byte, error) {
 				// If type is map[string]interface{} then we have nested object, Recurse
 				o, err := xreflect(j)
 				if err != nil {
+					log.Println(err)
 					return nil, err
 				}
 				fields = append(fields, NewField(key, "struct", o...))
 			case []interface{}:
 				gtype, err := sliceType(j)
 				if err != nil {
+					log.Println(err)
 					return nil, err
 				}
 				fields = append(fields, NewField(key, gtype))
@@ -129,6 +141,7 @@ func sliceType(j []interface{}) (string, error) {
 	if t == "[]struct" {
 		o, err := xreflect(j[0])
 		if err != nil {
+			log.Println(err)
 			return "", err
 		}
 		f := NewField("", "struct", o...)

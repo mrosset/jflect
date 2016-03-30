@@ -44,6 +44,10 @@ func goField(jf string) string {
 			mkUpper = true
 			continue
 		}
+		if c == '-' {
+			mkUpper = true
+			continue
+		}
 		gf += string(c)
 	}
 	return fmt.Sprintf("%s", gf)
