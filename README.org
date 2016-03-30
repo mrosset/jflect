@@ -1,6 +1,5 @@
 #+TITLE: Jflect
 
-* jflect:
 Takes JSON from stdin and outputs go structs to stdout.
 
 * Documentation
