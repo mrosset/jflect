@@ -40,7 +40,11 @@ func goField(jf string) string {
 			c = unicode.ToUpper(c)
 			mkUpper = false
 		}
-		if c == '_' {
+		switch c {
+		case '_':
+			mkUpper = true
+			continue
+		case '-':
 			mkUpper = true
 			continue
 		}

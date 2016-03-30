@@ -20,6 +20,9 @@ var testFiles = []testFile{
 	{
 		path: "testdata/gotimer.json",
 	},
+	{
+		path: "testdata/hyphenated.json",
+	},
 }
 
 func TestReflect(t *testing.T) {
