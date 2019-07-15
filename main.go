@@ -33,7 +33,7 @@ func main() {
 	}
 }
 
-func read(r io.Reader, w io.Writer) error {
+func Read(r io.Reader, w io.Writer) error {
 	var v interface{}
 	err := json.NewDecoder(r).Decode(&v)
 	if err != nil {
