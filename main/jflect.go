@@ -5,26 +5,17 @@
 package main
 
 import (
-	"errors"
-	"flag"
 	"github.com/mathew-bowersox/jflect"
 	glog "log"
 	"os"
 )
 
 // TODO: write proper Usage and README
-var (
-	log               = glog.New(os.Stderr, "", glog.Lshortfile)
-	fstruct           = flag.String("s", "Results", "struct name for json object")
-	debug             = false
-	ErrNotValidSyntax = errors.New("Json reflection is not valid Go syntax")
-)
 
 func main() {
-	flag.Parse()
 	err := generate.Generate(os.Stdin, os.Stdout)
 	if err != nil {
-		log.Fatal(err)
+		glog.Fatal(err)
 	}
 }
 
