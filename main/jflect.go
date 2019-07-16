@@ -15,7 +15,7 @@ import (
 // TODO: write proper Usage and README
 var (
 	log               = glog.New(os.Stderr, "", glog.Lshortfile)
-	fstruct           = flag.String("s", "Foo", "struct name for json object")
+	fstruct           = flag.String("s", "Results", "struct name for json object")
 	debug             = false
 	ErrNotValidSyntax = errors.New("Json reflection is not valid Go syntax")
 )
