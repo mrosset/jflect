@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package generate
 
 import (
 	"bytes"
@@ -25,13 +25,7 @@ var (
 	ErrNotValidSyntax = errors.New("Json reflection is not valid Go syntax")
 )
 
-func main() {
-	flag.Parse()
-	err := read(os.Stdin, os.Stdout)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+
 
 func Read(r io.Reader, w io.Writer) error {
 	var v interface{}
