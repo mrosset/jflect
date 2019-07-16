@@ -28,7 +28,11 @@ var (
 
 
 
-func Generate(r io.Reader, w io.Writer) error {
+func Generate(r io.Reader, w io.Writer, structName *string) error {
+	flag.Parse()
+	if fstruct == nil{
+		fstruct = structName
+	}
 	var v interface{}
 	err := json.NewDecoder(r).Decode(&v)
 	if err != nil {

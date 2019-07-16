@@ -13,7 +13,7 @@ import (
 // TODO: write proper Usage and README
 
 func main() {
-	err := generate.Generate(os.Stdin, os.Stdout)
+	err := generate.Generate(os.Stdin, os.Stdout, "")
 	if err != nil {
 		glog.Fatal(err)
 	}
