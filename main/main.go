@@ -22,7 +22,7 @@ var (
 
 func main() {
 	flag.Parse()
-	err := generate.Read(os.Stdin, os.Stdout)
+	err := generate.Generate(os.Stdin, os.Stdout)
 	if err != nil {
 		log.Fatal(err)
 	}

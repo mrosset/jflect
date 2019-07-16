@@ -17,6 +17,7 @@ import (
 	"sort"
 )
 
+
 // TODO: write proper Usage and README
 var (
 	log               = glog.New(os.Stderr, "", glog.Lshortfile)
@@ -27,7 +28,7 @@ var (
 
 
 
-func Read(r io.Reader, w io.Writer) error {
+func Generate(r io.Reader, w io.Writer) error {
 	var v interface{}
 	err := json.NewDecoder(r).Decode(&v)
 	if err != nil {

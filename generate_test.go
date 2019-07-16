@@ -35,7 +35,7 @@ func TestReflect(t *testing.T) {
 		}
 		defer fd.Close()
 		got := new(bytes.Buffer)
-		err = Read(fd, got)
+		err = Generate(fd, got)
 		if err != nil {
 			t.Error(err)
 		}
@@ -94,7 +94,7 @@ func TestHyphenError(t *testing.T) {
 	bw := bytes.NewBufferString(j)
 	out, _ := os.Open(os.DevNull)
 	defer out.Close()
-	err := Read(bw, out)
+	err := Generate(bw, out)
 	if err != nil {
 		t.Error(err)
 	}
