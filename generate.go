@@ -30,7 +30,7 @@ var (
 
 func Generate(r io.Reader, w io.Writer, structName *string) error {
 	flag.Parse()
-	if fstruct == nil{
+	if structName != nil{
 		fstruct = structName
 	}
 	var v interface{}
