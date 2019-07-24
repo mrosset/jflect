@@ -1,4 +1,4 @@
-package main
+package generate
 
 import (
 	"bytes"
@@ -35,7 +35,8 @@ func TestReflect(t *testing.T) {
 		}
 		defer fd.Close()
 		got := new(bytes.Buffer)
-		err = read(fd, got)
+		strNme := "FromTestResult"
+		err = Generate(fd, got, &strNme)
 		if err != nil {
 			t.Error(err)
 		}
@@ -94,7 +95,8 @@ func TestHyphenError(t *testing.T) {
 	bw := bytes.NewBufferString(j)
 	out, _ := os.Open(os.DevNull)
 	defer out.Close()
-	err := read(bw, out)
+	structNme := "testHyphonResult"
+	err := Generate(bw, out, &structNme)
 	if err != nil {
 		t.Error(err)
 	}

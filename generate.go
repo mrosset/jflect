@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package generate
 
 import (
 	"bytes"
@@ -17,6 +17,7 @@ import (
 	"sort"
 )
 
+
 // TODO: write proper Usage and README
 var (
 	log               = glog.New(os.Stderr, "", glog.Lshortfile)
@@ -25,15 +26,13 @@ var (
 	ErrNotValidSyntax = errors.New("Json reflection is not valid Go syntax")
 )
 
-func main() {
-	flag.Parse()
-	err := read(os.Stdin, os.Stdout)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
-func read(r io.Reader, w io.Writer) error {
+
+func Generate(r io.Reader, w io.Writer, structName *string) error {
+	flag.Parse()
+	if structName != nil{
+		fstruct = structName
+	}
 	var v interface{}
 	err := json.NewDecoder(r).Decode(&v)
 	if err != nil {
